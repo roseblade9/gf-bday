@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f6b7ce">
+<title>для Mei Mei 💗</title>
+<style>
+  * { box-sizing: border-box; }
+  :root { --pink:#f7b7ce; --deep:#9e496e; --cream:#fff8fb; }
+  body {
+    margin:0; min-height:100svh; overflow-x:hidden; color:var(--cream);
+    font-family: ui-rounded, "Trebuchet MS", system-ui, sans-serif;
+    background:#eeb0c7;
+  }
+  .wallpaper {
+    position:fixed; inset:-35px; z-index:-3;
+    background-image:url("assets/meimei.jpg");
+    background-size:190px 270px; background-repeat:repeat;
+    filter:blur(13px) saturate(.8); transform:scale(1.08);
+    opacity:.72;
+  }
+  .pink-wash {
+    position:fixed; inset:0; z-index:-2;
+    background:linear-gradient(135deg,rgba(255,190,214,.78),rgba(225,143,178,.72),rgba(255,220,231,.78));
+  }
+  #falling { position:fixed; inset:0; overflow:hidden; pointer-events:none; z-index:5; }
+  .fall {
+    position:absolute; top:-45px; left:var(--x); font-size:var(--size);
+    opacity:var(--opacity); animation:drift var(--duration) linear var(--delay) infinite;
+    filter:drop-shadow(0 3px 5px #a64b7440); will-change:transform;
+  }
+  @keyframes drift {
+    0% { transform:translate3d(0,-8vh,0) rotate(0deg); }
+    100% { transform:translate3d(var(--sway),112vh,0) rotate(var(--spin)); }
+  }
+  
+  main {
+    width:100%; padding:0 18px;
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+    position:relative; text-align:center;
+  }
+  
+  /* --- ПЛАВНЫЕ ПЕРЕХОДЫ ЭКРАНОВ --- */
+  .screen { 
+    width:100%; display:flex; flex-direction:column; align-items:center; 
+    position: relative; transition: opacity 0.8s ease, visibility 0.8s ease;
+  }
+  .hidden-screen { 
+    opacity: 0; visibility: hidden; pointer-events: none; 
+    position: absolute; inset: 0; 
+  }
+
+  /* --- ПЕРВЫЙ ЭКРАН --- */
+  #pet-screen {
+    min-height: 100svh;
+    justify-content: center;
+    padding-top: 10vh;
+    padding-bottom: 5vh;
+  }
+
+  .prompt {
+    color:#8c3f62; font-size:clamp(27px,7vw,43px); font-weight:900;
+    letter-spacing:.015em; margin:0 0 15px;
+    text-shadow:0 2px 0 #fff8,0 8px 25px #fff7;
+  }
+  
+  /* --- СЕРДЕЧКИ ПРОГРЕССА --- */
+  .hearts-container { display: flex; gap: 6px; margin-bottom: 20px; }
+  .heart-icon { 
+    font-size: 20px; color: #d48aab; transition: transform 0.3s ease, color 0.3s ease;
+    user-select: none;
+  }
+  .heart-icon.filled { 
+    color: #e63c74; transform: scale(1.3); 
+    text-shadow: 0 0 10px rgba(230,60,116,0.5);
+  }
+
+  .pet-zone { 
+    position: relative; display:flex; align-items:center; justify-content:center; 
+    width:min(90vw,430px); min-height:320px; 
+    margin-top: 50px; /* Увеличили отступ, чтобы котик не задевал сердечки */
+  }
+  .meimei {
+    display:block; width:min(62vw,260px); max-height:53svh; object-fit:contain;
+    cursor:pointer; user-select:none; -webkit-user-drag:none;
+    transform:scale(var(--growth,1)); transform-origin:center;
+    transition:transform .28s cubic-bezier(.2,1.5,.45,1);
+    filter:drop-shadow(0 18px 25px #72314b35);
+    outline:none; z-index: 2;
+  }
+  .meimei.pulse { animation:pulse .42s ease; }
+  @keyframes pulse {
+    0% { transform:scale(var(--growth,1)); }
+    35% { transform:scale(calc(var(--growth,1) * 1.12)); }
+    68% { transform:scale(calc(var(--growth,1) * .97)); }
+    100% { transform:scale(var(--growth,1)); }
+  }
+  .meimei:focus-visible { filter:drop-shadow(0 0 15px #fff); }
+
+  /* --- РЕАКЦИИ НАД КОТИКОМ --- */
+  .reaction {
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    background: #fff; color: #d6336c; font-weight: 900; font-size: clamp(16px, 4vw, 22px);
+    padding: 8px 16px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    opacity: 0; pointer-events: none; z-index: 10;
+    white-space: nowrap;
+  }
+  .reaction.pop { animation: popReaction 1.5s cubic-bezier(0.2, 1.5, 0.5, 1) both; }
+  @keyframes popReaction {
+    0% { opacity: 0; transform: translate(-50%, 20px) scale(0.5); }
+    20% { opacity: 1; transform: translate(-50%, -10px) scale(1.1); }
+    80% { opacity: 1; transform: translate(-50%, -20px) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -40px) scale(0.9); }
+  }
+
+  /* --- ЛЕТЯЩИЕ СЕРДЕЧКИ --- */
+  .fly-heart {
+    position: fixed; pointer-events: none; z-index: 100; font-size: 24px;
+    animation: flyUp 1s ease-out forwards;
+  }
+  @keyframes flyUp {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    100% { transform: translate(-50%, -150px) scale(0.5); opacity: 0; }
+  }
+
+  /* --- КОНФЕТТИ --- */
+  .confetti {
+    position: fixed; top: -20px; pointer-events: none; z-index: 100;
+    animation: fallDown var(--dur) linear forwards;
+  }
+  @keyframes fallDown {
+    0% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 1; }
+    100% { transform: translate3d(var(--sway), 110vh, 0) rotate(var(--spin)); opacity: 0; }
+  }
+
+  /* --- ВТОРАЯ СТРАНИЦА --- */
+  #birthday-screen {
+    position: relative; 
+    overflow: hidden; 
+    min-height: 100svh; 
+    padding: 40px 10px;
+    width: 100%;
+    border-radius: 20px;
+  }
+
+  #birthday-screen::before {
+    content: "";
+    position: absolute; inset: 0; z-index: -1;
+    background-image: url("assets/meimei.jpg");
+    background-size: 140px 190px; 
+    background-repeat: repeat;
+    opacity: 0.15;
+    filter: blur(2px) saturate(0.8);
+    animation: slowBg 60s linear infinite;
+  }
+  @keyframes slowBg {
+    0% { background-position: 0 0; }
+    100% { background-position: 280px 380px; }
+  }
+
+  .collage-layer {
+    position: absolute; inset: 0; 
+    display: flex; justify-content: center; 
+    z-index: 1; pointer-events: none;
+  }
+  .collage-inner {
+    position: relative; 
+    width: min(100%, 1100px); 
+    height: 100%; 
+    pointer-events: auto; 
+  }
+
+  .birthday-content {
+    position: relative; z-index: 10;
+    width: 100%; display: flex; flex-direction: column; align-items: center;
+  }
+
+  .birthday-title {
+    color:#963d66; font-size:clamp(32px,8vw,56px); line-height:1.05;
+    font-weight:1000; margin:0 0 17px; text-shadow:0 3px 0 #fff9,0 10px 28px #fff6;
+  }
+  .main-pic {
+    width:min(88vw,520px); max-height:52svh; object-fit:contain;
+    border-radius:8px; box-shadow:0 18px 55px #74304b45;
+    transform:rotate(-1.2deg);
+    position: relative; z-index: 5;
+  }
+  
+  .scatter-pic {
+    position: absolute;
+    border-radius: 12px;
+    box-shadow: 0 12px 35px #74304b40;
+    object-fit: cover;
+    z-index: 1;
+    animation: floaty 5s ease-in-out infinite;
+    transition: transform 0.3s cubic-bezier(0.2, 1.5, 0.5, 1), box-shadow 0.3s;
+    cursor: pointer;
+  }
+  
+  .scatter-pic:hover { 
+    transform: scale(1.15) rotate(0deg) !important; 
+    z-index: 20; 
+    box-shadow: 0 20px 50px #74304b60;
+  }
+
+  @keyframes floaty { 50% { transform:translateY(-8px) rotate(calc(var(--rot) + 5deg)); } }
+
+  .p1 { --rot: -12deg; width: clamp(140px, 22vw, 210px); top: 5%; left: -2%; animation-delay: 0s; }
+  .p2 { --rot: 15deg;  width: clamp(150px, 24vw, 230px); top: 8%; right: -3%; animation-delay: 0.5s; }
+  .p3 { --rot: -8deg;  width: clamp(140px, 22vw, 210px); bottom: 8%; left: -4%; animation-delay: 1s; }
+  .p4 { --rot: 12deg;  width: clamp(150px, 23vw, 220px); bottom: 10%; right: -2%; animation-delay: 1.5s; }
+  .p5 { --rot: 25deg;  width: clamp(110px, 18vw, 170px); top: 32%; left: 2%; animation-delay: 0.8s; }
+  
+  /* Опустили картинку вниз (было 9%, стало 1%) */
+  .p6 { --rot: -15deg; width: clamp(120px, 20vw, 180px); bottom: 1%; left: 42%; animation-delay: 1.2s; }
+  
+  .p7 { --rot: -20deg; width: clamp(130px, 21vw, 190px); top: 40%; right: 1%; animation-delay: 0.3s; }
+
+  .wish {
+    max-width:600px; margin:22px auto 0; padding:22px 25px;
+    border-radius:24px; background:#fff9; color:#713650;
+    box-shadow:0 14px 45px #9b47652c; backdrop-filter:blur(10px);
+    font-size:clamp(16px,4vw,19px); line-height:1.7;
+    position: relative; z-index: 10;
+  }
+  .wish strong { color:#a63d70; }
+  .sparkle { position:absolute; font-size:25px; animation:twinkle 1.8s ease-in-out infinite; z-index: 10; }
+  .s1 { left:8%; top:25%; } .s2 { right:9%; bottom:18%; animation-delay:.6s; }
+  @keyframes twinkle { 50% { transform:scale(1.4) rotate(18deg); opacity:.55; } }
+
+  /* --- КНОПКА "ЕЩЁ РАЗ" --- */
+  .btn-again {
+    margin-top: 50px; /* Увеличили отступ сверху, чтобы не задевать текст */
+    margin-bottom: 30px; padding: 14px 28px;
+    font-size: 18px; font-weight: 900; color: #fff;
+    background: linear-gradient(135deg, #f07dac, #d64575);
+    border: none; border-radius: 30px; cursor: pointer;
+    box-shadow: 0 8px 25px rgba(214, 69, 117, 0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+    z-index: 10; position: relative;
+    font-family: inherit;
+  }
+  .btn-again:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 12px 30px rgba(214, 69, 117, 0.5); }
+  .btn-again:active { transform: translateY(1px) scale(0.98); }
+
+  @media (max-width:480px) {
+    #pet-screen { padding-top: 8vh; }
+    .pet-zone { min-height:290px; margin-top: 40px; } /* Отступ для мобилок */
+    .meimei { width:min(66vw,250px); }
+    .main-pic { max-height:43svh; }
+    
+    .scatter-pic { width: 100px !important; }
+    .p1 { top: 2%; left: -6%; }
+    .p2 { top: 4%; right: -6%; }
+    .p3 { bottom: 2%; left: -4%; }
+    .p4 { bottom: 4%; right: -4%; }
+    .p5, .p7 { display: none; }
+    
+    /* Опустили картинку на мобилке (было 6%, стало 1%) */
+    .p6 { bottom: 1%; left: 35%; } 
+  }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms!important; transition-duration:.01ms!important; } }
+</style>
+</head>
+<body>
+<div class="wallpaper"></div><div class="pink-wash"></div>
+<div id="falling" aria-hidden="true"></div>
+
+<main>
+  <!-- ЭКРАН 1 -->
+  <section class="screen" id="pet-screen">
+    <h1 class="prompt">погладь meimei</h1>
+    
+    <!-- Сердечки прогресса -->
+    <div class="hearts-container" id="hearts-container"></div>
+    
+    <div class="pet-zone">
+      <!-- Реакции -->
+      <div class="reaction" id="reaction"></div>
+      
+      <img class="meimei" id="meimei" src="assets/meimei.jpg" alt="Mei Mei — нажми, чтобы погладить" role="button" tabindex="0">
+    </div>
+  </section>
+
+  <!-- ЭКРАН 2 -->
+  <section class="screen hidden-screen" id="birthday-screen">
+    
+    <div class="collage-layer">
+      <div class="collage-inner">
+        <img src="assets/1.jpg" class="scatter-pic p1" alt="Милые девочки">
+        <img src="assets/2.jpg" class="scatter-pic p2" alt="Аниме поздравление">
+        <img src="assets/3.jpg" class="scatter-pic p3" alt="Котенок">
+        <img src="assets/4.jpg" class="scatter-pic p4" alt="Кот с шариками">
+        <img src="assets/5.jpg" class="scatter-pic p5" alt="Кот с тортом">
+        <img src="assets/6.jpg" class="scatter-pic p6" alt="Рисунок кота">
+        <img src="assets/7.jpg" class="scatter-pic p7" alt="Мем с днем рождения">
+      </div>
+    </div>
+
+    <div class="birthday-content">
+      <span class="sparkle s1">✧</span><span class="sparkle s2">♡</span>
+      <h1 class="birthday-title">С ДНЁМ РОЖДЕНИЯ! 💗</h1>
+      <img class="main-pic" src="assets/main.jpg" alt="Праздничная картинка">
+      <div class="wish">
+        Привет, моя любимая девушка, я поздравляю тебя с днем рождения! Я желаю,
+        чтобы в этой жизни у тебя было как можно больше поводов улыбаться!!! Крепкого тебе здоровья,
+        как ментального так и физического, много любви и много деняк, чтобы покупать скины и игры,
+        а самое главное много сил. Я искренне желаю тебе никогда не опускать руки перед трудностями и
+        верить, что все будет хорошо. Ну и самое главное - желаю тебе иммортала в валике и пройти
+        все игры которые ты хочешь. (а еще я всегда рядом чтобы помочь тебе и порадовать тебя)!!
+        <br><strong>Оставайся такой же ахуенной. С праздником, моя малышка! Я очень сильно тебя люблю 💞</strong>
+      </div>
+      <button class="btn-again" id="btn-again">Ещё раз 💞</button>
+    </div>
+  </section>
+</main>
+
+<script>
+  // --- ИНИЦИАЛИЗАЦИЯ ЗВУКА ---
+  let audioCtx;
+  function playBoop() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    
+    // Синтез мягкого "мрр"
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.15);
+    
+    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+    
+    osc.connect(gain).connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.2);
+  }
+
+  // --- ПЕРЕМЕННЫЕ ---
+  const pet = document.getElementById('meimei');
+  const petScreen = document.getElementById('pet-screen');
+  const birthdayScreen = document.getElementById('birthday-screen');
+  const heartsContainer = document.getElementById('hearts-container');
+  const reactionEl = document.getElementById('reaction');
+  const btnAgain = document.getElementById('btn-again');
+  
+  const total = 10;
+  let taps = 0;
+  let idleTimer;
+
+  const reactions = ["мрр", "ещё!", "хи-хи", "обожаю", "мур-мур", "ня!", "❤", "ещё чуток", "почти...", "ура!"];
+
+  // Создаем 10 пустых сердечек
+  function initHearts() {
+    heartsContainer.innerHTML = '';
+    for (let i = 0; i < total; i++) {
+      const span = document.createElement('span');
+      span.className = 'heart-icon';
+      span.textContent = '🤍';
+      heartsContainer.appendChild(span);
+    }
+  }
+  initHearts();
+
+  // --- ЛОГИКА КЛИКА ---
+  function petMeiMei(e) {
+    if (taps >= total) return;
+
+    // 1. Звук
+    playBoop();
+
+    // 2. Обновление счетчика и сердечек
+    taps++;
+    const hearts = heartsContainer.querySelectorAll('.heart-icon');
+    if (hearts[taps - 1]) {
+      hearts[taps - 1].classList.add('filled');
+      hearts[taps - 1].textContent = '💗';
+    }
+
+    // 3. Анимация котика
+    const growth = 1 + taps * 0.052;
+    pet.style.setProperty('--growth', growth);
+    pet.classList.remove('pulse');
+    void pet.offsetWidth;
+    pet.classList.add('pulse');
+
+    // 4. Реакция над котиком
+    reactionEl.textContent = reactions[taps - 1] || "супер!";
+    reactionEl.classList.remove('pop');
+    void reactionEl.offsetWidth;
+    reactionEl.classList.add('pop');
+
+    // 5. Летящее сердечко от курсора (или центра на телефоне)
+    let x = e.clientX || (e.touches && e.touches[0].clientX) || window.innerWidth / 2;
+    let y = e.clientY || (e.touches && e.touches[0].clientY) || window.innerHeight / 2;
+    
+    const flyHeart = document.createElement('div');
+    flyHeart.className = 'fly-heart';
+    flyHeart.textContent = ['💗', '💖', '🌸', '✨'][Math.floor(Math.random()*4)];
+    flyHeart.style.left = x + 'px';
+    flyHeart.style.top = y + 'px';
+    document.body.appendChild(flyHeart);
+    setTimeout(() => flyHeart.remove(), 1000);
+
+    // Сброс таймера секретного сообщения
+    resetIdleTimer();
+
+    // Проверка на переход
+    if (taps === total) {
+      clearTimeout(idleTimer);
+      setTimeout(transitionToBirthday, 600);
+    }
+  }
+
+  // --- СЕКРЕТНОЕ СООБЩЕНИЕ (IDLE) ---
+  function resetIdleTimer() {
+    clearTimeout(idleTimer);
+    if (taps >= total) return;
+    
+    idleTimer = setTimeout(() => {
+      reactionEl.textContent = "ну погладь же… 🥺";
+      reactionEl.classList.remove('pop');
+      void reactionEl.offsetWidth;
+      reactionEl.classList.add('pop');
+    }, 5000);
+  }
+  resetIdleTimer();
+
+  // --- ПЕРЕХОД НА ВТОРУЮ СТРАНИЦУ ---
+  function transitionToBirthday() {
+    petScreen.classList.add('hidden-screen');
+    birthdayScreen.classList.remove('hidden-screen');
+    
+    // Конфетти
+    launchConfetti();
+    
+    // Запускаем анимации появления текста
+    document.querySelectorAll('#birthday-screen .birthday-title, #birthday-screen .main-pic, #birthday-screen .wish, #birthday-screen .btn-again').forEach((el, index) => {
+      el.classList.add('reveal');
+      el.style.animationDelay = `${index * 0.2}s`;
+    });
+  }
+
+  // --- КОНФЕТТИ ---
+  function launchConfetti() {
+    const symbols = ['💗', '✨', '🌸', '💖', '⭐'];
+    
+    for (let i = 0; i < 60; i++) {
+      const el = document.createElement('div');
+      el.className = 'confetti';
+      el.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+      el.style.left = Math.random() * 100 + 'vw';
+      el.style.fontSize = (12 + Math.random() * 20) + 'px';
+      el.style.setProperty('--dur', (2 + Math.random() * 2) + 's');
+      el.style.setProperty('--sway', (Math.random() * 200 - 100) + 'px');
+      el.style.setProperty('--spin', (Math.random() * 720 - 360) + 'deg');
+      el.style.animationDelay = (Math.random() * 0.5) + 's';
+      
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 4500);
+    }
+  }
+
+  // --- КНОПКА "ЕЩЁ РАЗ" ---
+  btnAgain.addEventListener('click', () => {
+    // Сброс переменных
+    taps = 0;
+    pet.style.setProperty('--growth', 1);
+    initHearts();
+    resetIdleTimer();
+
+    // Плавный возврат
+    birthdayScreen.classList.add('hidden-screen');
+    petScreen.classList.remove('hidden-screen');
+    
+    // Убираем классы анимации со второй страницы, чтобы в следующий раз они сработали снова
+    document.querySelectorAll('#birthday-screen .reveal').forEach(el => el.classList.remove('reveal'));
+  });
+
+  // --- ОБРАБОТЧИКИ СОБЫТИЙ ---
+  pet.addEventListener('click', petMeiMei);
+  pet.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); petMeiMei(e); }
+  });
+
+  // --- ПАДАЮЩИЕ СИМВОЛЫ НА ФОНЕ ---
+  const falling = document.getElementById('falling');
+  const fallSymbols = ['♡','♥','💗','🌸','❀','✿','🤍'];
+  for (let i=0; i<46; i++) {
+    const item = document.createElement('span');
+    item.className = 'fall';
+    item.textContent = fallSymbols[Math.floor(Math.random()*fallSymbols.length)];
+    item.style.setProperty('--x', Math.random()*100+'%');
+    item.style.setProperty('--size', (12+Math.random()*20)+'px');
+    item.style.setProperty('--opacity', (.35+Math.random()*.55));
+    item.style.setProperty('--duration', (8+Math.random()*14)+'s');
+    item.style.setProperty('--delay', (-Math.random()*20)+'s');
+    item.style.setProperty('--sway', (Math.random()*150-75)+'px');
+    item.style.setProperty('--spin', (Math.random()*600-300)+'deg');
+    falling.appendChild(item);
+  }
+</script>
+</body>
+</html>
